@@ -52,11 +52,11 @@ canvas#pc{width:270px;height:480px;border-radius:22px;border:4px solid var(--pin
   <div class="note">Everything runs in your browser. Your video never leaves your device.</div>
  </div>
  <div class="card"><h2>2 · Place the facecam</h2>
-  <div class="note">Your video has the facecam in a corner? Pick where, then fine-tune.</div>
+  <div class="note">Facecam in a corner? Pick where, then adjust the zoom.</div>
   <div class="pre"><button class="btn alt" data-p="0,0">Top left</button><button class="btn alt" data-p="100,0">Top right</button><button class="btn alt" data-p="0,100">Bottom left</button><button class="btn alt" data-p="100,100">Bottom right</button></div>
   <label>Facecam X</label><input type="range" id="fx" min="0" max="100" value="0">
   <label>Facecam Y</label><input type="range" id="fy" min="0" max="100" value="0">
-  <label>Facecam size</label><input type="range" id="fs" min="8" max="60" value="25">
+  <label>Facecam zoom (slide right to zoom in)</label><input type="range" id="fs" min="8" max="60" value="25" style="direction:rtl">
   <label>Gameplay left ↔ right</label><input type="range" id="gx" min="0" max="100" value="50">
   <label>Gameplay up ↕ down</label><input type="range" id="gy" min="0" max="100" value="50">
   <label>Gameplay zoom</label><input type="range" id="gz" min="100" max="300" value="100">
@@ -119,7 +119,7 @@ function record(cl,i,n){return new Promise(async res=>{
  mr.ondataavailable=e=>e.data.size&&ch.push(e.data);
  mr.onstop=()=>{const b=new Blob(ch,{type:mt||'video/webm'}),d=document.createElement('div');
   d.innerHTML='<video controls playsinline></video><div class="note">Clip '+(i+1)+' · '+(mt.includes('mp4')?'.mp4':'.webm')+'</div><button class="btn sm sv" style="width:100%;margin-top:6px">Save video</button>';
-  d.querySelector('video').src=URL.createObjectURL(b);const ext=mt.includes('mp4')?'mp4':'webm',sb=d.querySelector('.sv');sb.onclick=async()=>{try{const dl=await claude.use('downloads');if(!dl)throw 0;await dl.save({filename:'vice-clip-'+(i+1)+'.'+ext,data:b});sb.textContent='Saved ✓'}catch(e){if(!e||e.code!=='declined')sb.textContent='Save unavailable – long-press the video'}};$('#res').append(d);capNow=null;res()};
+  d.querySelector('video').src=URL.createObjectURL(b);const ext=mt.includes('mp4')?'mp4':'webm',sb=d.querySelector('.sv');sb.onclick=async()=>{try{let dl=null;try{dl=await claude.use('downloads')}catch(_){}const fn='vice-clip-'+(i+1)+'.'+ext;if(dl)await dl.save({filename:fn,data:b});else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;a.click()}sb.textContent='Saved ✓'}catch(e){if(!e||e.code!=='declined')sb.textContent='Save unavailable – long-press the video'}};$('#res').append(d);capNow=null;res()};
  stopFn=()=>{v.pause();mr.stop();clearInterval(tm)};
  const tm=setInterval(()=>{$('#pb').style.width=(((i+(v.currentTime-cl.s)/(cl.e-cl.s))/n)*100)+'%'},200);
  mr.start();recEnd=cl.e;await v.play()})}
